@@ -12,11 +12,13 @@ public class Ball : MonoBehaviour {
 
     public RigidBodyType rbType;
 
-    Vector2 mousePosDown;
-    Vector2 mousePosUp;
-    Rigidbody rb;
-    Rigidbody2D rb2d;
+	public CircleCollider2D scoreCollider;
 
+    Rigidbody rb;
+	Rigidbody2D rb2d;
+	float previousVelocity;
+
+	CircleCollider2D myCollider;
     
     public bool haveSpawned = false;
 
@@ -25,6 +27,7 @@ public class Ball : MonoBehaviour {
     private void Awake()
     {
         startPos = transform.localPosition;
+		previousVelocity = -1;
         GetRigidbody();
 
     }
@@ -34,6 +37,7 @@ public class Ball : MonoBehaviour {
         if(rbType == RigidBodyType.RB2D)
         {
             rb2d = GetComponent<Rigidbody2D>();
+			myCollider = GetComponent<CircleCollider2D>();
         }
         else
         {
@@ -75,8 +79,62 @@ public class Ball : MonoBehaviour {
         }
     }
 
-    void Update () {
+	private void OnCollisionExit2D(Collision2D collision)
+	{
+
+	}
+
+	private void OnTriggerExit2D(Collider2D collision)
+	{
+		if (collision.gameObject.tag == "Lane")
+		{
+			gameObject.SetActive(false);
+		}
+	}
+
+	void Update () {
+
+		if(rb2d.velocity.y < 0f)
+		{
+			if(previousVelocity >= 0f)
+			{
+				previousVelocity = rb2d.velocity.y;
+				GetLengthToScoreMiddle();
+				//Debug.Log("Score!!");
+			}
+		}
+		else
+		{
+			previousVelocity = rb2d.velocity.y;
+		}
+
     }
+
+	void GetLengthToScoreMiddle()
+	{
+
+		
+
+		bool isCollidng = myCollider.IsTouching(scoreCollider);
+		if (isCollidng == false)
+			return;
+		Debug.Log(isCollidng);
+
+		Vector2 scoreCenter = scoreCollider.GetComponent<RectTransform>().anchoredPosition;
+		Vector2 mineCenter = GetComponent<RectTransform>().anchoredPosition;
+		Debug.DrawLine(scoreCenter, mineCenter);
+		float length = (scoreCenter - mineCenter).magnitude;
+		float combineRadius = Mathf.Abs(myCollider.radius + scoreCollider.radius);
+		//Debug.Log("Length: " + length + " Radius: " + combineRadius);
+		/*if (length > combineRadius)
+		{
+			return;
+		}*/
+		Debug.Log("Length: " + length + " combineRadius: " + combineRadius);
+		int scoreAmount = (int)((1 - (length / (scoreCollider.radius * 2))) * 100);
+
+		Debug.Log(scoreAmount);
+	}
 
     
 }

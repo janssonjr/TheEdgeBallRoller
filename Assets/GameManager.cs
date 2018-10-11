@@ -10,8 +10,11 @@ public class GameManager : MonoBehaviour {
     float timeToSpawn = 5f;
     public float ballForce = 1f;
     public UnityEngine.UI.Text text;
+	public float ballWaitTime;
+	public bool InstantForceUp;
+	public UnityEngine.UI.Toggle forceToggle;
 
-    private void Awake()
+	private void Awake()
     {
 
         text.text = ballForce.ToString();
@@ -19,18 +22,19 @@ public class GameManager : MonoBehaviour {
 
     private void Start()
     {
+		InstantForceUp = forceToggle.isOn;
         Reset();
     }
 
-    public void AddBallForce()
+    public void AddBallForce(float aAmount)
     {
-        ballForce += 50;
+        ballForce += aAmount;
         text.text = ballForce.ToString();
     }
 
-    public void SubtractBallForce()
+    public void SubtractBallForce(float aAmount)
     {
-        ballForce -= 50f;
+        ballForce -= aAmount;
         text.text = ballForce.ToString();
 
     }
@@ -50,7 +54,7 @@ public class GameManager : MonoBehaviour {
 
     private void Update()
     {
-        ballSpawnerTimer += Time.deltaTime;
+        //ballSpawnerTimer += Time.deltaTime;
         if(ballSpawnerTimer >= timeToSpawn * 2 && balls[2].haveSpawned == false)
         {
             balls[2].gameObject.SetActive(true);
@@ -62,5 +66,10 @@ public class GameManager : MonoBehaviour {
             balls[1].Spawn();
         }
     }
+
+	public void SwitchForceMode(bool aValue)
+	{
+		InstantForceUp = aValue;
+	}
 
 }
